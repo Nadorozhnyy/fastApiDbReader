@@ -22,8 +22,82 @@
 не ниже 3.10 и установленное 
 ПО для контейнеризации - [Docker](https://docs.docker.com/engine/install/)
 
-#### Запуск СУБД Postgresql
-```shell
-docker run --name guild-of-dev-db -e POSTGRES_USER=db_user -e POSTGRES_PASSWORD=secret -e POSTGRES_DB=guild-of-dev -p 5634:5432 -d postgres
+#### Настройка переменных окружения
+1. Скопируйте файл .env.dist в .env
+2. Заполните .env файл. Пример: 
+```yaml
+DB_PORT=5634:5432
+FASTAPI_PORT=8000:8000
+
+POSTGRES_HOST=db_app
+POSTGRES_USER=db_user
+POSTGRES_PASSWORD=secret
+POSTGRES_DB=guild-of-dev
+POSTGRES_PORT=5432
 ```
 
+#### Создаем образ Dockerfile
+```shell
+docker build . -t fastapi_app:latest
+```
+#### Запуск приложения в контейнере Docker
+```shell
+docker compose up
+```
+Будут запущенны два контейнера (FastApi и Postgres)
+#### Для остановки и удаления контейнера Docker
+```shell
+docker compose down
+```
+
+## End points
+### GET
+```bash
+GET /api/v1/humans/
+```
+#### Описание
+Получение строк из базы данных
+
+#### Параметры запроса
+- gender - фильтрация по полу (male или female)
+- limit - вернуть определенное количество записей из базы данных (от 1 до 100)
+
+#### Пример ответа
+```json
+[
+    {
+        "name": "Alina",
+        "gender": "male",
+        "id": 1
+    },
+    {
+        "name": "Nikita",
+        "gender": "female",
+        "id": 2
+    },
+    {
+        "name": "Vladimir",
+        "gender": "male",
+        "id": 3
+    }
+]
+
+```
+### POST
+```bash
+POST /api/v1/humans/
+```
+#### Описание
+Принимает JSON{id, name, gender}. Добавляет полученные данные в базу данных.
+
+#### Параметры запроса
+нет
+
+#### Пример ответа
+```json
+{
+    "ok": true,
+    "human_id": 11
+}
+
+```
